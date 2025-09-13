@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eco Disposal Classifier</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f3;
+            display: flex;
+            padding: 40px 20px;
+            min-height: 100vh;
+            background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1950&q=80');
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 12px 24px;
+            cursor: pointer;
+            background-color: #388e3c;
+            color: white;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #2e7d32;
+        }
+
+        #remove-image-btn {
+            margin-top: 10px;
+            background-color: #e53935;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        #remove-image-btn:hover {
+            background-color: #c62828;
+        }
+
+        #image-preview {
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: none;
+        }
+
+        textarea {
+            display: block;
+            margin: 30px auto 0 auto;
+            width: 100%;
+            max-width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            height: 100px;
+            color: #333;
+            background-color: #f9f9f9;
+            outline: none;
+            transition: border 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        textarea::placeholder {
+            color: #aaa;
+        }
+
+        button {
+            margin-top: 25px;
+            background-color: #388e3c;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2e7d32;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .recyclable {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .compostable {
+            background-color: #f1f8e9;
+            color: #33691e;
+        }
+
+        .trash {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+
+        .hazardous {
+            background-color: #fce4ec;
+            color: #ad1457;
+        }
+
+        .tip {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        header,
+        footer {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #2f6f4e;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        header{
+            margin-bottom:100px;
+        }
+        footer{
+            margin-top:100px;
+        }
+        .cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .cards :hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card {
+    background-color: #fefefe;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 250px;
+    padding: 1rem;
+    text-align: center;
+    color: #2f6f4e;
+  }
+
+  .card h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .card p {
+    font-size: 0.9rem;
+  }
+  
+    </style>
+</head>
+
+<body>
+    <header>Waste Classifier</header>
+
+    <div class="container">
+        <h1>Eco Disposal Classifier</h1>
+        <p>Upload an image or describe the item to get eco-friendly disposal tips.</p>
+
+        <label for="image-upload" class="custom-file-upload">Choose Image</label>
+        <input type="file" id="image-upload" accept="image/*" />
+        <img id="image-preview" src="" alt="" />
+        <button id="remove-image-btn" style="display:none;">Remove Image</button>
+
+        <textarea id="description" placeholder="PLEASE ENTER TEXT HERE"></textarea>
+        <button onclick="handleClassification()">Check Disposal Method</button>
+
+        <div id="result" class="result" style="display: none;"></div>
+        <div id="tip" class="tip" style="display: none;"></div>
+    </div>
+    <h1 style="background-color: #fffdfd;"> WASTE SEGREGATION GUIDE </h1>
+    <section class="cards">
+    <div class="card">
+      <h3>Green bag</h3>
+      <p>For compostable wet waste like food scraps and garden trimmings..</p>
+    </div>
+    <div class="card">
+      <h3>Blue Bag</h3>
+      <p>For dry recyclable items such as paper, plastic, glass, and metal.</p>
+    </div>
+    <div class="card">
+      <h3>Black Bag</h3>
+      <p>For general trash including dirty wrappers, tissues, and broken items.</p>
+    </div>
+    <div class="card">
+      <h3>Yellow Bag</h3>
+      <p>For biomedical waste like bandages, gloves, and sanitary products.</p>
+    </div>
+    <div class="card">
+      <h3>Red Bag</h3>
+      <p>For contaminated plastic waste such as used syringes and tubing..</p>
+    </div>
+   
+  </section>
+    <footer>2025 Waste Classifier Project</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.5.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+
+    <script>
+        let net;
+        const imageUpload = document.getElementById('image-upload');
+        const imagePreview = document.getElementById('image-preview');
+        const descriptionInput = document.getElementById('description');
+        const resultEl = document.getElementById('result');
+        const tipEl = document.getElementById('tip');
+        const removeImageBtn = document.getElementById('remove-image-btn');
+
+        async function loadModel() {
+            net = await mobilenet.load();
+            console.log('MobileNet model loaded');
+        }
+        loadModel();
+
+        imageUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                imagePreview.src = event.target.result;
+                imagePreview.style.display = 'block';
+                removeImageBtn.style.display = 'inline-block';
+            }
+            reader.readAsDataURL(file);
+        });
+
+        removeImageBtn.addEventListener('click', () => {
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+            imageUpload.value = '';
+            removeImageBtn.style.display = 'none';
+        });
+
+        async function classifyImage(imgElement) {
+            const predictions = await net.classify(imgElement);
+            console.log('Predictions:', predictions);
+            return predictions.map(p => p.className.toLowerCase());
+        }
+
+        function keywordMatches(label, keyword) {
+            const cleanLabel = label.toLowerCase();
+            const cleanKeyword = keyword.toLowerCase();
+
+            if (cleanLabel.includes(cleanKeyword)) return true;
+            if (cleanKeyword.endsWith('s') && cleanLabel.includes(cleanKeyword.slice(0, -1))) return true;
+            if (!cleanKeyword.endsWith('s') && cleanLabel.includes(cleanKeyword + 's')) return true;
+
+            return false;
+        }
+
+        const rules = [
+            {
+                keywords: [
+                    "apple", "apples", "apple core", "banana", "bananas", "banana peel", "orange", "oranges", "orange peel", "lemon", "lemons", "lime", "limes",
+                    "grapefruit", "grapefruits", "citrus peel", "berry", "berries", "grape", "grapes", "peach", "peaches", "pear", "pears", "plum", "plums", "mango", "mangoes",
+                    "watermelon", "watermelons", "melon", "melons", "pineapple", "pineapples", "pineapple skin", "kiwi", "kiwis", "papaya", "papayas", "avocado", "avocados",
+                    "fig", "figs", "cherry", "cherries", "coconut", "coconuts", "pomegranate", "pomegranates", "date", "dates", "raisin", "raisins", "fruit scraps", "overripe fruit",
+                    "fruit peel", "fruit skin",
+
+                    "carrot", "carrots", "carrot peel", "potato", "potatoes", "potato peel", "tomato", "tomatoes", "cucumber", "cucumbers", "onion", "onions", "onion skin",
+                    "garlic", "garlic skin", "lettuce", "spinach", "kale", "cabbage", "broccoli", "cauliflower",
+                    "pepper", "peppers", "zucchini", "squash", "eggplant", "green bean", "corn", "corn cob", "celery", "beet",
+                    "radish", "turnip", "pumpkin", "asparagus", "vegetable scraps", "veggie peel",
+
+                    "coffee grounds", "tea bag", "bread", "rice", "pasta", "egg shell", "eggshell", "oatmeal", "peanut shell",
+
+                    "leaves", "grass", "twig", "twigs", "branch", "branches", "garden trimmings", "dead plants", "flower", "flowers",
+                    "pine needle", "pine needles", "sawdust",
+
+                    "paper towel", "napkin", "tissue", "shredded paper", "shredded newspaper",
+                    "paper egg carton", "compostable plate", "compostable cup", "uncoated paper",
+
+                    "cotton", "wool", "hair", "fur", "feathers", "wood shavings", "toothpick", "matchstick",
+                    "nut shell", "natural cork"
+                ],
+                category: "compostable",
+                tip: "These items can be composted at home or via green bins. Avoid mixing with plastic, meat, or dairy unless using industrial composting."
+            },
+
+            {
+                keywords: [
+                    "plastic bottle", "can", "aluminum", "glass", "paper", "cardboard", "magazine", "jar",
+                    "tin", "foil", "newspaper", "brochure", "catalog", "flyer"
+                ],
+                category: "recyclable",
+                tip: "Rinse and place in your recycling bin. Avoid contamination with food waste or grease."
+            },
+
+            {
+                keywords: [
+                    "pizza box", "styrofoam", "chip bag", "diaper", "candy wrapper", "plastic bag",
+                    "foam container", "plastic utensils", "greasy paper", "foil-lined bag", "bubble wrap"
+                ],
+                category: "trash",
+                tip: "These items usually cannot be recycled or composted. Dispose of in general waste."
+            },
+
+            {
+                keywords: [
+                    "battery", "used battery", "paint", "chemical", "light bulb", "mercury", "oil",
+                    "cleaner", "pesticide", "nail polish", "aerosol", "spray can"
+                ],
+                category: "hazardous",
+                tip: "Take to a local hazardous waste collection site. Do not dispose of in regular bins or drains."
+            },
+
+            {
+                keywords: [
+                    "electronics", "phone", "laptop", "charger", "printer", "keyboard", "tv", "monitor",
+                    "tablet", "cable", "headphones"
+                ],
+                category: "hazardous",
+                tip: "Recycle e-waste at a certified e-recycling center. Many retailers accept old electronics."
+            },
+
+            {
+                keywords: [
+                    "clothes", "fabric", "shirt", "jeans", "towel", "shoes", "socks", "sweater"
+                ],
+                category: "recyclable",
+                tip: "Donate if in good condition. Otherwise, bring to a textile recycling facility."
+            }
+        ];
+
+        function showResult(category, tip) {
+            resultEl.style.display = "block";
+            tipEl.style.display = "block";
+
+            resultEl.className = "result " + category;
+            resultEl.textContent = `🗑️ This item is: ${category.toUpperCase()}`;
+            tipEl.textContent = `💡 Tip: ${tip}`;
+        }
+
+        async function handleClassification() {
+            const description = descriptionInput.value.trim().toLowerCase();
+            const file = imageUpload.files[0];
+
+            if (file) {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = async () => {
+                    const labels = await classifyImage(img);
+                    classifyByLabels(labels);
+                };
+            } else if (description) {
+                classifyByText(description);
+            } else {
+                alert("Please upload an image or enter a description.");
+            }
+        }
+
+        function classifyByLabels(labels) {
+            for (const rule of rules) {
+                for (const keyword of rule.keywords) {
+                    if (labels.some(label => keywordMatches(label, keyword))) {
+                        showResult(rule.category, rule.tip);
+                        return;
+                    }
+                }
+            }
+            showResult("trash", "Item not recognized. When in doubt, throw it out.");
+        }
+
+        function classifyByText(text) {
+            for (const rule of rules) {
+                for (const keyword of rule.keywords) {
+                    if (keywordMatches(text, keyword)) {
+                        showResult(rule.category, rule.tip);
+                        return;
+                    }
+                }
+            }
+            showResult("trash", "Item not recognized. When in doubt, throw it out.");
+        }
+    </script>
+</body>
+
+</html>
